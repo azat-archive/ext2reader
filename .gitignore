@@ -1,0 +1,86 @@
+# Source https://github.com/github/gitignore/blob/master/C.gitignore
+
+# Object files
+*.o
+
+# Libraries
+*.lib
+*.a
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Custom
+
+# bak
+*.bak
+*.swp
+*.~
+*.swap
+
+# build directory (just in case, because we already exclude object files)
+/build/
+/.cmake
+
+/core
+/vgcore*
+
+# cmake
+CMakeFiles
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# crawler in/out
+/in
+/out
+
+# profilers
+/oprofile_data
+gmon.out
+
+# git archive
+/*.zip
+
+# mac
+.DS_Store
+
+# logs
+*.log
+
+# IDE
+/nbproject
+/.idea
+/.cproject
+/.project
+/.settings/
+
+# Ignore all patches in ROOT directory
+# Don't ignore in ROOT, because we can have some custom patches for some libs.
+/*.patch
+
+# ctags
+/tags
+/ctags
+
+# profiling - gcov
+*.gcov
+*.gcda
+*.gcno
+
+# ignore archives
+*.tgz
+*.tar.gz
+*.gz
+*.tbz
+*.tar.bz2
+
+ranks
