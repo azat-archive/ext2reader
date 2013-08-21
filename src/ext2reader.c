@@ -31,13 +31,14 @@ void readDirs(ext2_filsys fs)
     ext2_ino_t ino;
     struct ext2_inode inode;
     while (!ext2fs_get_next_inode(scanner, &ino, &inode)) {
-        if (!ext2fs_check_directory(fs, ino)) {
-            break;
+        if (ext2fs_check_directory(fs, ino)) {
+            continue;
         }
+
+        char buffer[PATH_MAX];
+        assert(!ext2fs_dir_iterate(fs, ino, 0, buffer, dirIterator, NULL));
     }
 
-    char buffer[PATH_MAX];
-    assert(!ext2fs_dir_iterate(fs, ino, 0, buffer, dirIterator, NULL));
 
     ext2fs_close_inode_scan(scanner);
 }
