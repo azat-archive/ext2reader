@@ -12,6 +12,16 @@
 #include <ext2fs/ext2fs.h>
 
 
+int dirIterator(struct ext2_dir_entry *dirent,
+                int offset,
+                int blocksize,
+                char *buf,
+                void *priv_data)
+{
+    printf("%s\n", dirent->name);
+    return 0;
+}
+
 void readDirs(ext2_filsys fs)
 {
     ext2_inode_scan scanner;
@@ -20,25 +30,14 @@ void readDirs(ext2_filsys fs)
 
     ext2_ino_t ino;
     struct ext2_inode inode;
-    char *buffer;
     while (!ext2fs_get_next_inode(scanner, &ino, &inode)) {
-        /**
-         * TODO: by some reason this check is not correct
-         */
-        if (ext2fs_check_directory(fs, ino) == ENOTDIR) {
-            continue;
+        if (!ext2fs_check_directory(fs, ino)) {
+            break;
         }
-
-        ext2fs_get_pathname(fs, ino, 0, &buffer);
-        /**
-         * Skip non-dirs here
-         */
-        if (buffer[0] != '/') {
-            continue;
-        }
-
-        printf("%s\n", buffer);
     }
+
+    char buffer[PATH_MAX];
+    assert(!ext2fs_dir_iterate(fs, ino, 0, buffer, dirIterator, NULL));
 
     ext2fs_close_inode_scan(scanner);
 }
