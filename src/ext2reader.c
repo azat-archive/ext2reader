@@ -65,26 +65,15 @@ int dirIterator(ext2_ino_t dir,
 
     printf("%s%s\n", it->prefix, it->name);
 
-    return 0;
-}
-
-void readDirs(struct DirIterate *it)
-{
-    if (it->ino) {
-        assert(!ext2fs_dir_iterate2(it->fs, it->ino, 0, it->dirIterateBuffer, dirIterator, it));
-    }
-
-    while (!ext2fs_get_next_inode(it->scanner, &it->ino, &it->inode)) {
-        if (!LINUX_S_ISDIR(it->inode.i_mode)) {
-            continue;
-        }
-
+    if (LINUX_S_ISDIR(it->inode.i_mode)) {
+        it->ino = dirent->inode;
         dirIterateAddroot(it);
-        readDirs(it);
+        assert(!ext2fs_dir_iterate2(it->fs, it->ino, 0, it->dirIterateBuffer, dirIterator, it));
         dirIterateRemoveRoot(it);
     }
-}
 
+    return 0;
+}
 
 int main(int argc, char **argv)
 {
@@ -98,11 +87,12 @@ int main(int argc, char **argv)
     struct DirIterate it;
     memset(&it, 0, sizeof(struct DirIterate));
     strcpy(it.prefix, "/");
+    it.ino = EXT2_ROOT_INO;
 
     assert(!ext2fs_open(dev, BLOCK_FLAG_READ_ONLY, 0, 0, unix_io_manager, &it.fs));
     assert(!ext2fs_open_inode_scan(it.fs, 0 /* TODO: adjust */, &it.scanner));
 
-    readDirs(&it);
+    assert(!ext2fs_dir_iterate2(it.fs, it.ino, 0, it.dirIterateBuffer, dirIterator, &it));
 
     ext2fs_close_inode_scan(it.scanner);
     assert(!ext2fs_close(it.fs));
