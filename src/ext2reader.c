@@ -33,8 +33,8 @@ void dirIterateAddroot(struct DirIterate *it)
 
     ext2fs_get_pathname(it->fs, it->ino, 0, &buffer);
 
-    strcpy(it->prefix, buffer);
-    strcpy(it->prefix, "/");
+    strcat(it->prefix, buffer);
+    strcat(it->prefix, "/");
 }
 void dirIterateRemoveRoot(struct DirIterate *it)
 {
