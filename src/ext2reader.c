@@ -19,6 +19,9 @@ struct DirIterate
     ext2_filsys fs;
     ext2_inode_scan scanner;
 
+    ext2_ino_t ino;
+    struct ext2_inode inode;
+
     char prefix[PATH_MAX];
     char name[PATH_MAX];
 };
@@ -46,16 +49,13 @@ int dirIterator(ext2_ino_t dir,
 
 void readDirs(struct DirIterate *it)
 {
-    ext2_ino_t ino;
-    struct ext2_inode inode;
-
-    while (!ext2fs_get_next_inode(it->scanner, &ino, &inode)) {
-        if (!LINUX_S_ISDIR(inode.i_mode)) {
+    while (!ext2fs_get_next_inode(it->scanner, &it->ino, &it->inode)) {
+        if (!LINUX_S_ISDIR(it->inode.i_mode)) {
             continue;
         }
 
         char buffer[PATH_MAX];
-        assert(!ext2fs_dir_iterate2(it->fs, ino, 0, buffer, dirIterator, it));
+        assert(!ext2fs_dir_iterate2(it->fs, it->ino, 0, buffer, dirIterator, it));
     }
 }
 
@@ -69,10 +69,10 @@ int main(int argc, char **argv)
 
     const char *dev = argv[1];
 
-    struct DirIterate it = {
-        .prefix = "/",
-        .name = ""
-    };
+    struct DirIterate it;
+    memset(&it, 0, sizeof(struct DirIterate));
+    strcpy(it.prefix, "/");
+
     assert(!ext2fs_open(dev, BLOCK_FLAG_READ_ONLY, 0, 0, unix_io_manager, &it.fs));
     assert(!ext2fs_open_inode_scan(it.fs, 0 /* TODO: adjust */, &it.scanner));
 
