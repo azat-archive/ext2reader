@@ -16,7 +16,7 @@ int dirIterator(struct ext2_dir_entry *dirent,
                 int offset,
                 int blocksize,
                 char *buf,
-                void *priv_data)
+                void *privData)
 {
     printf("%s\n", dirent->name);
     return 0;
