@@ -12,9 +12,11 @@
 #include <ext2fs/ext2fs.h>
 
 
-int dirIterator(struct ext2_dir_entry *dirent,
+int dirIterator(ext2_ino_t dir,
+                int entry,
+                struct ext2_dir_entry *dirent,
                 int offset,
-                int blocksize,
+                int blockSize,
                 char *buf,
                 void *privData)
 {
@@ -36,7 +38,7 @@ void readDirs(ext2_filsys fs)
         }
 
         char buffer[PATH_MAX];
-        assert(!ext2fs_dir_iterate(fs, ino, 0, buffer, dirIterator, NULL));
+        assert(!ext2fs_dir_iterate2(fs, ino, 0, buffer, dirIterator, NULL));
     }
 
 
