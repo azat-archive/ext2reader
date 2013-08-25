@@ -14,7 +14,8 @@
 
 struct DirIterate
 {
-    char *prefix;
+    char prefix[PATH_MAX];
+    char name[PATH_MAX];
 };
 
 
@@ -28,7 +29,12 @@ int dirIterator(ext2_ino_t dir,
 {
     struct DirIterate *it = (struct DirIterate *)privData;
 
-    printf("%s\n", dirent->name);
+    int length = (dirent->name_len & 0xFF);
+    strncpy(it->name, dirent->name, length);
+    // TODO: do we need this?
+    it->name[length] = '\0';
+
+    printf("%s\n", it->name);
     return 0;
 }
 
