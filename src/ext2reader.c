@@ -49,13 +49,17 @@ int dirIterator(ext2_ino_t dir,
 
 void readDirs(struct DirIterate *it)
 {
+    if (it->ino) {
+        char buffer[PATH_MAX];
+        assert(!ext2fs_dir_iterate2(it->fs, it->ino, 0, buffer, dirIterator, it));
+    }
+
     while (!ext2fs_get_next_inode(it->scanner, &it->ino, &it->inode)) {
         if (!LINUX_S_ISDIR(it->inode.i_mode)) {
             continue;
         }
 
-        char buffer[PATH_MAX];
-        assert(!ext2fs_dir_iterate2(it->fs, it->ino, 0, buffer, dirIterator, it));
+        readDirs(it);
     }
 }
 
