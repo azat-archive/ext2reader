@@ -1,5 +1,7 @@
 
 /**
+ * Only directory reader
+ *
  * TODO: add logger
  * TODO: add options
  */
@@ -46,6 +48,7 @@ void readDirs(struct DirIterate *it)
 {
     ext2_ino_t ino;
     struct ext2_inode inode;
+
     while (!ext2fs_get_next_inode(it->scanner, &ino, &inode)) {
         if (!LINUX_S_ISDIR(inode.i_mode)) {
             continue;
