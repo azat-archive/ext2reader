@@ -65,7 +65,8 @@ int dirIterator(ext2_ino_t dir,
 
     printf("%s%s\n", it->prefix, it->name);
 
-    if (LINUX_S_ISDIR(it->inode.i_mode)) {
+    assert(!ext2fs_read_inode(it->fs, dirent->inode, &it->inode));
+    if (LINUX_S_ISDIR(it->inode.i_mode) && dirent->name[0] != '.' /* TODO: fix this hack */) {
         it->ino = dirent->inode;
         dirIterateAddroot(it);
         assert(!ext2fs_dir_iterate2(it->fs, it->ino, 0, it->dirIterateBuffer, dirIterator, it));
