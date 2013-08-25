@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <limits.h>
+#include <string.h>
 
 #include <ext2fs/ext2fs.h>
 
@@ -21,11 +22,30 @@ struct DirIterate
 
     ext2_ino_t ino;
     struct ext2_inode inode;
+    ext2_ino_t rootIno;
 
     char prefix[PATH_MAX];
     char name[PATH_MAX];
     char dirIterateBuffer[PATH_MAX];
 };
+void dirIterateAddroot(struct DirIterate *it)
+{
+    char *buffer;
+
+    it->rootIno = it->ino;
+    ext2fs_get_pathname(it->fs, it->rootIno, 0, &buffer);
+
+    strcpy(it->prefix, buffer);
+    strcpy(it->prefix, "/");
+}
+void dirIterateRemoveRoot(struct DirIterate *it)
+{
+    it->rootIno = 0;
+
+    void *lastSlash = memrchr(it->prefix, '/', strlen(it->prefix) - 1);
+    assert(lastSlash);
+    lastSlash = '\0';
+}
 
 
 int dirIterator(ext2_ino_t dir,
@@ -59,7 +79,9 @@ void readDirs(struct DirIterate *it)
             continue;
         }
 
+        dirIterateAddroot(it);
         readDirs(it);
+        dirIterateRemoveRoot(it);
     }
 }
 
