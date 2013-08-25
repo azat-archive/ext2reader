@@ -47,7 +47,7 @@ void readDirs(struct DirIterate *it)
     ext2_ino_t ino;
     struct ext2_inode inode;
     while (!ext2fs_get_next_inode(it->scanner, &ino, &inode)) {
-        if (ext2fs_check_directory(it->fs, ino)) {
+        if (!LINUX_S_ISDIR(inode.i_mode)) {
             continue;
         }
 
