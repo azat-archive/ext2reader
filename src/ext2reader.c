@@ -12,6 +12,12 @@
 #include <ext2fs/ext2fs.h>
 
 
+struct DirIterate
+{
+    char *prefix;
+};
+
+
 int dirIterator(ext2_ino_t dir,
                 int entry,
                 struct ext2_dir_entry *dirent,
@@ -20,6 +26,8 @@ int dirIterator(ext2_ino_t dir,
                 char *buf,
                 void *privData)
 {
+    struct DirIterate *it = (struct DirIterate *)privData;
+
     printf("%s\n", dirent->name);
     return 0;
 }
@@ -27,6 +35,7 @@ int dirIterator(ext2_ino_t dir,
 void readDirs(ext2_filsys fs)
 {
     ext2_inode_scan scanner;
+    struct DirIterate it;
 
     assert(!ext2fs_open_inode_scan(fs, 0 /* TODO: adjust */, &scanner));
 
@@ -38,7 +47,7 @@ void readDirs(ext2_filsys fs)
         }
 
         char buffer[PATH_MAX];
-        assert(!ext2fs_dir_iterate2(fs, ino, 0, buffer, dirIterator, NULL));
+        assert(!ext2fs_dir_iterate2(fs, ino, 0, buffer, dirIterator, &it));
     }
 
 
