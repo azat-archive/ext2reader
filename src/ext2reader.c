@@ -33,9 +33,9 @@ void dirIterateAddroot(struct DirIterate *it)
 }
 void dirIterateRemoveRoot(struct DirIterate *it)
 {
-    void *lastSlash = memrchr(it->prefix, '/', strlen(it->prefix) - 1);
+    char *lastSlash = (char *)memrchr(it->prefix, '/', strlen(it->prefix) - 1);
     assert(lastSlash);
-    lastSlash = '\0';
+    *(lastSlash + 1) = '\0';
 }
 
 
