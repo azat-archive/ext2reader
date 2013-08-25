@@ -25,7 +25,6 @@ struct DirIterate
 
     char prefix[PATH_MAX];
     char name[PATH_MAX];
-    char dirIterateBuffer[PATH_MAX];
 };
 void dirIterateAddroot(struct DirIterate *it)
 {
@@ -63,7 +62,7 @@ int dirIterator(ext2_ino_t dir,
 
         it->ino = dirent->inode;
         dirIterateAddroot(it);
-        assert(!ext2fs_dir_iterate2(it->fs, it->ino, 0, it->dirIterateBuffer, dirIterator, it));
+        assert(!ext2fs_dir_iterate2(it->fs, it->ino, 0, NULL, dirIterator, it));
         dirIterateRemoveRoot(it);
     }
 
@@ -87,7 +86,7 @@ int main(int argc, char **argv)
     assert(!ext2fs_open(dev, BLOCK_FLAG_READ_ONLY, 0, 0, unix_io_manager, &it.fs));
     assert(!ext2fs_open_inode_scan(it.fs, 0 /* TODO: adjust */, &it.scanner));
 
-    assert(!ext2fs_dir_iterate2(it.fs, it.ino, 0, it.dirIterateBuffer, dirIterator, &it));
+    assert(!ext2fs_dir_iterate2(it.fs, it.ino, 0, NULL, dirIterator, &it));
 
     ext2fs_close_inode_scan(it.scanner);
     assert(!ext2fs_close(it.fs));
